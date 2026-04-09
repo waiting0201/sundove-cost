@@ -1,0 +1,6 @@
+@use '../../shared/styles/forms' as *;
+
+.form-group { @include form-group; }
+.form-label { @include form-label; }
+.form-input { @include form-input; }
+.form-select { @include form-select; }

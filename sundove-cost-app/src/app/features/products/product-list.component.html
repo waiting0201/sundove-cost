@@ -1,0 +1,162 @@
+<div class="flex flex-col h-full">
+  <!-- Header -->
+  <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200 bg-white">
+    <div class="flex items-center gap-3">
+      <h1 class="text-xl font-bold text-brand">SKU 管理</h1>
+      <span class="text-xs text-muted">
+        {{ store.filteredCount() }} / {{ store.totalCount() }} 筆
+      </span>
+    </div>
+    <div class="flex items-center gap-2">
+      <button (click)="importExcel()"
+        class="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+        [disabled]="importing()">
+        {{ importing() ? '匯入中...' : '📥 匯入' }}
+      </button>
+      <button (click)="exportExcel()"
+        class="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+        📤 匯出
+      </button>
+      <button (click)="openProduct('new')"
+        class="px-3 py-1.5 text-xs bg-brand text-white rounded-md hover:bg-brand-dark transition-colors">
+        + 新增
+      </button>
+      <button (click)="showColumnConfig.set(!showColumnConfig())"
+        class="px-3 py-1.5 text-xs border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+        ⚙ 欄位設定
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter bar -->
+  <div class="flex items-center gap-3 px-6 py-3 bg-gray-50 border-b border-gray-200">
+    <!-- Diameter chips -->
+    <span class="text-xs text-muted">線徑:</span>
+    <button
+      (click)="store.setFilter({ wireDiameter: null })"
+      class="chip"
+      [class.active]="store.filter().wireDiameter === null">
+      全部
+    </button>
+    @for (d of diameterOptions; track d) {
+      <button
+        (click)="store.setFilter({ wireDiameter: d })"
+        class="chip"
+        [class.active]="store.filter().wireDiameter === d">
+        {{ d }}mm
+      </button>
+    }
+
+    <div class="w-px h-5 bg-gray-300 mx-1"></div>
+
+    <!-- Handle size -->
+    <span class="text-xs text-muted">手柄:</span>
+    <select class="text-xs border border-gray-300 rounded px-2 py-1"
+      [ngModel]="store.filter().handleSize ?? ''"
+      (ngModelChange)="store.setFilter({ handleSize: $event || null })">
+      <option value="">全部</option>
+      @for (h of handleOptions; track h) {
+        <option [value]="h">{{ h }}</option>
+      }
+    </select>
+
+    <div class="w-px h-5 bg-gray-300 mx-1"></div>
+
+    <!-- Search -->
+    <input type="text" placeholder="搜尋 SKU..."
+      class="text-xs border border-gray-300 rounded px-2 py-1 w-40"
+      [ngModel]="store.filter().search"
+      (ngModelChange)="store.setFilter({ search: $event })" />
+
+    <button (click)="store.clearFilters()"
+      class="text-xs text-muted hover:text-brand transition-colors ml-auto">
+      清除篩選
+    </button>
+  </div>
+
+  <!-- Column config popup -->
+  @if (showColumnConfig()) {
+    <div class="absolute right-6 top-32 z-30 bg-white border border-gray-200 rounded-lg shadow-xl p-4 w-56">
+      <div class="text-sm font-semibold mb-2">顯示欄位設定</div>
+      @for (col of store.allColumns(); track col.key) {
+        <label class="flex items-center gap-2 py-1 cursor-pointer">
+          <input type="checkbox"
+            [checked]="col.visible"
+            (change)="store.toggleColumn(col.key)"
+            [disabled]="col.key === 'sku'"
+            class="rounded border-gray-300 text-brand focus:ring-brand/30" />
+          <span class="text-xs">{{ col.label }}</span>
+          @if (col.key === 'sku') {
+            <span class="text-xs text-muted">(固定)</span>
+          }
+        </label>
+      }
+      <button (click)="showColumnConfig.set(false)"
+        class="mt-2 w-full text-xs text-center py-1.5 bg-brand text-white rounded hover:bg-brand-dark transition-colors">
+        完成
+      </button>
+    </div>
+  }
+
+  <!-- Table -->
+  <div class="flex-1 overflow-auto">
+    @if (store.loading()) {
+      <div class="text-center text-muted py-12">載入中...</div>
+    } @else {
+      <table class="sku-table">
+        <thead>
+          <tr>
+            <th class="w-10">
+              <input type="checkbox"
+                [checked]="store.selectedIds().size === store.filteredCount() && store.filteredCount() > 0"
+                (change)="$any($event.target).checked ? store.selectAll() : store.clearSelection()"
+                class="rounded border-gray-300 text-brand focus:ring-brand/30" />
+            </th>
+            @for (col of store.visibleColumns(); track col.key) {
+              <th [style.width]="col.width" (click)="store.toggleSort(col.key)">
+                {{ col.label }}
+                <span class="text-xs ml-0.5">{{ sortIcon(col.key) }}</span>
+              </th>
+            }
+          </tr>
+        </thead>
+        <tbody>
+          @for (product of store.filteredProducts(); track product.id) {
+            <tr [class.selected]="store.selectedIds().has(product.id)" (click)="openProduct(product.id)" class="cursor-pointer hover:bg-gray-50 transition-colors">
+              <td class="w-10 text-center" (click)="$event.stopPropagation()">
+                <input type="checkbox"
+                  [checked]="store.selectedIds().has(product.id)"
+                  (change)="store.toggleSelect(product.id)"
+                  class="rounded border-gray-300 text-brand focus:ring-brand/30" />
+              </td>
+              @for (col of store.visibleColumns(); track col.key) {
+                <td>
+                  <span class="tabular-nums">{{ formatCell(product, col.key) }}</span>
+                </td>
+              }
+            </tr>
+          }
+          @if (store.filteredProducts().length === 0) {
+            <tr>
+              <td [attr.colspan]="store.visibleColumns().length + 1" class="text-center text-muted py-8">
+                @if (store.totalCount() === 0) {
+                  尚無 SKU 資料。請先匯入產品。
+                } @else {
+                  篩選條件無符合結果
+                }
+              </td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+
+  <!-- Footer -->
+  @if (store.selectedIds().size > 0) {
+    <div class="flex items-center gap-3 px-6 py-2 bg-brand-light border-t border-gray-200 text-sm">
+      <span>已選 {{ store.selectedIds().size }} 項</span>
+      <button class="text-xs text-brand hover:underline" (click)="store.clearSelection()">取消選取</button>
+    </div>
+  }
+</div>

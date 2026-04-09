@@ -1,0 +1,204 @@
+<!-- Three-column layout: Input | Process Breakdown | Summary -->
+<div class="flex h-full">
+
+  <!-- LEFT: Input Panel (300px fixed) -->
+  <div class="w-[300px] shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
+    <div class="p-4">
+      <h2 class="text-base font-semibold text-brand mb-4">產品規格</h2>
+
+      <!-- Wire Diameter -->
+      <div class="form-group mb-3">
+        <label class="form-label">線徑 (mm)</label>
+        <select
+          class="form-select"
+          [ngModel]="store.wireDiameter()"
+          (ngModelChange)="store.wireDiameter.set($event)"
+        >
+          <option [ngValue]="3">3 mm</option>
+          <option [ngValue]="4">4 mm</option>
+          <option [ngValue]="5">5 mm</option>
+          <option [ngValue]="6">6 mm</option>
+          <option [ngValue]="8">8 mm</option>
+        </select>
+      </div>
+
+      <!-- Exposed Length -->
+      <div class="form-group mb-3">
+        <label class="form-label">外露長度 (mm)</label>
+        <input
+          type="number"
+          class="form-input"
+          [ngModel]="store.exposedLength()"
+          (ngModelChange)="store.exposedLength.set($event)"
+        />
+      </div>
+
+      <!-- Internal Length -->
+      <div class="form-group mb-3">
+        <label class="form-label">內含長度 (mm)</label>
+        <input
+          type="number"
+          class="form-input"
+          [ngModel]="store.internalLength()"
+          (ngModelChange)="store.internalLength.set($event)"
+        />
+      </div>
+
+      <!-- Material Shape -->
+      <div class="form-group mb-3">
+        <label class="form-label">材料形體</label>
+        <select
+          class="form-select"
+          [ngModel]="store.materialShape()"
+          (ngModelChange)="store.materialShape.set($event)"
+        >
+          <option value="round">圓鐵</option>
+          <option value="hex">六角</option>
+          <option value="square">四角</option>
+        </select>
+      </div>
+
+      <!-- Steel Type -->
+      <div class="form-group mb-3">
+        <label class="form-label">鋼種</label>
+        <select
+          class="form-select"
+          [ngModel]="store.steelType()"
+          (ngModelChange)="store.steelType.set($event)"
+        >
+          <option value="8660">8660</option>
+          <option value="6150">6150</option>
+        </select>
+      </div>
+
+      <!-- Divider -->
+      <hr class="my-4 border-gray-200" />
+
+      <!-- Optional Processes -->
+      <h3 class="text-xs font-medium text-gray-500 uppercase mb-2">選配工序</h3>
+
+      <label class="flex items-center gap-2 mb-2 cursor-pointer">
+        <input
+          type="checkbox"
+          class="rounded border-gray-300 text-brand focus:ring-brand/30"
+          [ngModel]="store.hasHexRing()"
+          (ngModelChange)="store.hasHexRing.set($event)"
+        />
+        <span class="text-sm">六角環</span>
+      </label>
+
+      <label class="flex items-center gap-2 mb-2 cursor-pointer">
+        <input
+          type="checkbox"
+          class="rounded border-gray-300 text-brand focus:ring-brand/30"
+          [ngModel]="store.hasThroughHead()"
+          (ngModelChange)="store.hasThroughHead.set($event)"
+        />
+        <span class="text-sm">貫通頭</span>
+      </label>
+
+      <label class="flex items-center gap-2 mb-2 cursor-pointer">
+        <input
+          type="checkbox"
+          class="rounded border-gray-300 text-brand focus:ring-brand/30"
+          [ngModel]="store.hasTpDrill()"
+          (ngModelChange)="store.hasTpDrill.set($event)"
+        />
+        <span class="text-sm">TP 鑽孔 (+1元)</span>
+      </label>
+
+      <label class="flex items-center gap-2 mb-4 cursor-pointer">
+        <input
+          type="checkbox"
+          class="rounded border-gray-300 text-brand focus:ring-brand/30"
+          [ngModel]="store.hasStamp()"
+          (ngModelChange)="store.hasStamp.set($event)"
+        />
+        <span class="text-sm">打字 (+0.2元)</span>
+      </label>
+
+      <!-- Divider -->
+      <hr class="my-4 border-gray-200" />
+
+      <!-- Quick Preview -->
+      <h3 class="text-xs font-medium text-gray-500 uppercase mb-2">快速預覽</h3>
+      <div class="space-y-1">
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-600">總長</span>
+          <span class="font-mono tabular-nums">{{ store.totalLength() }} mm</span>
+        </div>
+        <div class="flex justify-between text-sm">
+          <span class="text-gray-600">重量</span>
+          <span class="font-mono tabular-nums">{{ store.weight() | number:'1.4-4' }} g</span>
+        </div>
+        <div class="flex justify-between text-sm font-semibold mt-2 pt-2 border-t border-gray-200">
+          <span class="text-brand">鐵件總成本</span>
+          <span class="font-mono tabular-nums text-brand">{{ store.totalIronCost() | currencyTw:4 }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CENTER: Process Breakdown (flex-grow) -->
+  <div class="flex-1 overflow-y-auto bg-gray-50">
+    <div class="p-4">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-base font-semibold text-brand">工序成本明細</h2>
+        <span class="text-sm font-mono tabular-nums font-semibold text-brand">
+          鐵件小計: {{ store.totalIronCost() | currencyTw:4 }}
+        </span>
+      </div>
+
+      @if (!store.loaded()) {
+        <div class="text-center text-muted py-12">載入價格表資料中...</div>
+      } @else {
+        @for (p of store.processBreakdown(); track p.id) {
+          <app-process-card [data]="toProcessCard(p)" />
+        }
+      }
+    </div>
+  </div>
+
+  <!-- RIGHT: Summary Panel (320px fixed) -->
+  <div class="w-[320px] shrink-0 border-l border-gray-200 bg-white overflow-y-auto">
+    <div class="p-4">
+      <h2 class="text-base font-semibold text-brand mb-4">成本摘要</h2>
+
+      <!-- Cost waterfall -->
+      <div class="space-y-2">
+        @for (p of store.processBreakdown(); track p.id) {
+          <div class="flex justify-between text-sm" [class.text-muted]="!p.enabled">
+            <span>
+              {{ p.label }}
+              @if (p.optional) {
+                <span class="text-xs">{{ p.enabled ? '✓' : '✗' }}</span>
+              }
+            </span>
+            <span class="font-mono tabular-nums">{{ p.cost | currencyTw:4 }}</span>
+          </div>
+        }
+      </div>
+
+      <!-- Total -->
+      <div class="mt-4 pt-3 border-t-2 border-brand">
+        <div class="flex justify-between text-base font-bold">
+          <span class="text-brand">鐵件總成本</span>
+          <span class="font-mono tabular-nums text-brand">{{ store.totalIronCost() | currencyTw:4 }}</span>
+        </div>
+      </div>
+
+      <!-- Specs summary -->
+      <div class="mt-6 p-3 bg-gray-50 rounded-lg text-xs space-y-1">
+        <div class="font-medium text-gray-700 mb-1">計算參數</div>
+        <div class="flex justify-between"><span class="text-muted">線徑</span><span>{{ store.wireDiameter() }} mm</span></div>
+        <div class="flex justify-between"><span class="text-muted">外露長</span><span>{{ store.exposedLength() }} mm</span></div>
+        <div class="flex justify-between"><span class="text-muted">內含長</span><span>{{ store.internalLength() }} mm</span></div>
+        <div class="flex justify-between"><span class="text-muted">總長</span><span>{{ store.totalLength() }} mm</span></div>
+        <div class="flex justify-between"><span class="text-muted">材料</span><span>{{ store.materialShape() === 'round' ? '圓鐵' : store.materialShape() === 'hex' ? '六角' : '四角' }}</span></div>
+        <div class="flex justify-between"><span class="text-muted">比重</span><span class="font-mono">{{ store.density() }}</span></div>
+        <div class="flex justify-between"><span class="text-muted">重量</span><span class="font-mono">{{ store.weight() | number:'1.4-4' }} g</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>

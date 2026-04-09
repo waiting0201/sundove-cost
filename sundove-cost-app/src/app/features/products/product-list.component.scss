@@ -1,0 +1,10 @@
+@use '../../shared/styles/tables' as *;
+@use '../../shared/styles/forms' as *;
+
+.sku-table {
+  @include sku-table;
+}
+
+.chip {
+  @include chip;
+}

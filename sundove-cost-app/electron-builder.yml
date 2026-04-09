@@ -1,0 +1,57 @@
+appId: com.sundove.cost-calculator
+productName: "SundoveCost"
+copyright: "Copyright (c) 2026 Weypro Tech."
+publish: null
+
+directories:
+  output: release
+  buildResources: build-resources
+
+files:
+  - dist/**/*
+  - electron-dist/**/*
+  - package.json
+  - node_modules/**/*
+
+win:
+  target:
+    - target: nsis
+      arch: [x64]
+  artifactName: "${productName}-Setup-${version}.${ext}"
+
+nsis:
+  oneClick: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  uninstallDisplayName: "SundoveCost"
+  installerLanguages: ["zh_TW", "en_US"]
+  deleteAppDataOnUninstall: false
+  allowElevation: true
+  runAfterFinish: true
+
+mac:
+  target:
+    - target: dmg
+      arch: [arm64, x64]
+  artifactName: "${productName}-${version}-${arch}.${ext}"
+  category: public.app-category.business
+  identity: null
+
+dmg:
+  contents:
+    - x: 130
+      y: 220
+    - x: 410
+      y: 220
+      type: link
+      path: /Applications
+
+npmRebuild: false
+afterPack: ./scripts/rebuild-native.js
+
+asar: true
+asarUnpack:
+  - "node_modules/better-sqlite3/**/*"
+  - "node_modules/bindings/**/*"
+  - "node_modules/file-uri-to-path/**/*"

@@ -1,0 +1,112 @@
+<div class="p-6">
+  <h1 class="text-xl font-bold text-brand mb-6">總覽儀表板</h1>
+
+  <!-- Quick actions -->
+  <div class="flex gap-3 mb-6">
+    <a routerLink="/iron-cost"
+      class="px-4 py-2 bg-brand text-white text-sm rounded-md hover:bg-brand-dark transition-colors">
+      🔧 開始計算
+    </a>
+    <a routerLink="/price-tables"
+      class="px-4 py-2 bg-white text-gray-700 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+      📊 更新價格表
+    </a>
+    <a routerLink="/pricing"
+      class="px-4 py-2 bg-white text-gray-700 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+      💰 最終定價
+    </a>
+  </div>
+
+  @if (store.loading()) {
+    <div class="text-center text-muted py-12">載入中...</div>
+  } @else {
+    <!-- Metric cards -->
+    <div class="grid grid-cols-4 gap-4 mb-8">
+      <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <div class="text-2xl font-bold text-gray-900 tabular-nums">{{ store.productCount() }}</div>
+        <div class="text-xs text-muted mt-1">產品 SKU</div>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <div class="text-2xl font-bold text-gray-900 tabular-nums">{{ store.totalTableRows }}</div>
+        <div class="text-xs text-muted mt-1">價格表資料筆數</div>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <div class="text-2xl font-bold text-gray-900 tabular-nums">{{ store.exchangeRate() }}</div>
+        <div class="text-xs text-muted mt-1">匯率 NTD/USD</div>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-4 shadow-sm">
+        <div class="text-2xl font-bold text-gray-900">14</div>
+        <div class="text-xs text-muted mt-1">價格表</div>
+      </div>
+    </div>
+
+    <!-- Two-column layout -->
+    <div class="grid grid-cols-2 gap-6">
+      <!-- Recent changes -->
+      <div>
+        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">近期價格異動</h2>
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          @if (store.recentChanges().length === 0) {
+            <div class="text-center text-muted py-8 text-sm">尚無異動記錄</div>
+          } @else {
+            @for (change of store.recentChanges(); track change.id) {
+              <div class="flex items-center justify-between px-4 py-2.5 border-b border-gray-100 text-sm last:border-0">
+                <div>
+                  <span class="font-medium">{{ formatTableName(change.table_name) }}</span>
+                  @if (change.field_name) {
+                    <span class="text-muted"> · {{ change.field_name }}</span>
+                  }
+                  <div class="text-xs text-muted mt-0.5">
+                    @if (change.old_value !== null && change.new_value !== null) {
+                      {{ change.old_value }} → {{ change.new_value }}
+                    }
+                  </div>
+                </div>
+                <span class="text-xs text-muted whitespace-nowrap">{{ change.changed_at }}</span>
+              </div>
+            }
+          }
+        </div>
+      </div>
+
+      <!-- Quick navigation -->
+      <div>
+        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">快速前往</h2>
+        <div class="space-y-2">
+          <a routerLink="/iron-cost"
+            class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-brand/30 hover:shadow-sm transition-all">
+            <div>
+              <div class="text-sm font-semibold">🔧 鐵件成本計算</div>
+              <div class="text-xs text-muted">模組 A — 10 道工序成本</div>
+            </div>
+            <span class="text-muted">→</span>
+          </a>
+          <a routerLink="/pricing"
+            class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-brand/30 hover:shadow-sm transition-all">
+            <div>
+              <div class="text-sm font-semibold">💰 最終定價</div>
+              <div class="text-xs text-muted">模組 B — 散裝/吊牌</div>
+            </div>
+            <span class="text-muted">→</span>
+          </a>
+          <a routerLink="/products"
+            class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-brand/30 hover:shadow-sm transition-all">
+            <div>
+              <div class="text-sm font-semibold">📋 SKU 管理</div>
+              <div class="text-xs text-muted">{{ store.productCount() }} 筆產品資料</div>
+            </div>
+            <span class="text-muted">→</span>
+          </a>
+          <a routerLink="/price-tables"
+            class="flex items-center justify-between p-3 bg-white rounded-lg border border-gray-200 hover:border-brand/30 hover:shadow-sm transition-all">
+            <div>
+              <div class="text-sm font-semibold">📊 價格表管理</div>
+              <div class="text-xs text-muted">14 張價格表</div>
+            </div>
+            <span class="text-muted">→</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  }
+</div>

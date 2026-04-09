@@ -1,0 +1,65 @@
+<!-- Shell Layout: Topbar + Sidebar + Content + Status Bar -->
+<div class="flex h-screen flex-col overflow-hidden bg-gray-50">
+  <!-- Topbar -->
+  <header class="flex h-12 items-center justify-between border-b border-gray-200 bg-white px-4 shadow-sm">
+    <div class="flex items-center gap-3">
+      <button (click)="toggleSidebar()" class="text-gray-500 hover:text-gray-700 transition-colors">
+        <span class="text-lg">☰</span>
+      </button>
+      <span class="text-sm font-semibold text-brand">Sundove Cost v1.0</span>
+    </div>
+    <div class="flex items-center gap-4">
+    </div>
+  </header>
+
+  <!-- Main area: Sidebar + Content -->
+  <div class="flex flex-1 overflow-hidden">
+    <!-- Sidebar -->
+    <nav
+      class="flex flex-col border-r border-gray-200 bg-white transition-all duration-200 overflow-hidden"
+      [style.width.px]="sidebarExpanded() ? 220 : 72"
+    >
+      <div class="flex-1 overflow-y-auto py-2">
+        @for (item of navItems; track item.path) {
+          <a
+            [routerLink]="item.path"
+            routerLinkActive="bg-brand-light text-brand font-semibold"
+            [routerLinkActiveOptions]="{ exact: item.path === '/' }"
+            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+          >
+            <span class="text-lg w-6 text-center shrink-0">{{ item.icon }}</span>
+            @if (sidebarExpanded()) {
+              <span class="whitespace-nowrap">{{ item.label }}</span>
+            }
+          </a>
+          @if (sidebarExpanded() && item.children) {
+            @for (child of item.children; track child.path) {
+              <a
+                [routerLink]="child.path"
+                routerLinkActive="text-brand font-medium"
+                class="flex items-center pl-14 pr-4 py-1.5 text-xs text-gray-500 hover:text-gray-700 transition-colors"
+              >
+                {{ child.label }}
+              </a>
+            }
+          }
+        }
+      </div>
+
+    </nav>
+
+    <!-- Content Area -->
+    <main class="flex-1 overflow-y-auto" style="contain: layout style; will-change: transform;">
+      <router-outlet />
+    </main>
+  </div>
+
+  <!-- Status Bar -->
+  <footer class="flex h-7 items-center justify-between border-t border-gray-200 bg-white px-4 text-xs text-muted">
+    <span>匯率: 29.5 NTD/USD</span>
+    <span>Sundove Cost v1.0</span>
+  </footer>
+</div>
+
+<!-- Global Toast -->
+<app-toast />

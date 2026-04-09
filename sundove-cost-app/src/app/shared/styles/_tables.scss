@@ -1,0 +1,102 @@
+@mixin price-table {
+  width: 100%;
+  font-size: 0.875rem;
+  border-collapse: collapse;
+
+  th {
+    background-color: var(--color-brand);
+    color: white;
+    padding: 0.5rem 0.75rem;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #e5e7eb;
+    text-align: center;
+    font-size: 0.875rem;
+  }
+
+  tr:nth-child(even) td {
+    background-color: #f9fafb;
+  }
+
+  tr:hover td {
+    background-color: rgba(219, 234, 254, 0.5);
+  }
+
+  td.editable {
+    cursor: pointer;
+    transition: all 0.15s;
+
+    &:hover {
+      background-color: #eff6ff;
+      outline: 1px solid rgba(27, 79, 138, 0.3);
+      outline-offset: -1px;
+    }
+
+    &.editing {
+      padding: 0;
+
+      input {
+        width: 100%;
+        height: 100%;
+        padding: 0.5rem 0.75rem;
+        text-align: center;
+        font-size: 0.875rem;
+        border: 2px solid var(--color-brand);
+        outline: none;
+        background: white;
+      }
+    }
+  }
+
+  td.changed {
+    font-weight: 600;
+  }
+}
+
+@mixin sku-table {
+  width: 100%;
+  font-size: 0.875rem;
+
+  th {
+    padding: 0.5rem 0.75rem;
+    text-align: left;
+    font-weight: 500;
+    font-size: 0.75rem;
+    color: #6b7280;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-bottom: 2px solid #e5e7eb;
+    background-color: #f9fafb;
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      background-color: #f3f4f6;
+    }
+  }
+
+  td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid #f3f4f6;
+    font-size: 0.875rem;
+  }
+
+  tr {
+    transition: background-color 0.1s;
+
+    &:hover td {
+      background-color: #f9fafb;
+    }
+
+    &.selected td {
+      background-color: var(--color-brand-light);
+    }
+  }
+}

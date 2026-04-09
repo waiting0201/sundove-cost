@@ -1,0 +1,164 @@
+<!-- Two-column layout: Settings | Pricing Breakdown -->
+<div class="flex h-full">
+
+  <!-- LEFT: Settings Panel (320px) -->
+  <div class="w-[320px] shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
+    <div class="p-4">
+      <h2 class="text-base font-semibold text-brand mb-4">最終定價計算</h2>
+
+      <!-- Pricing mode -->
+      <div class="mb-4">
+        <label class="form-label">定價模式</label>
+        <div class="flex gap-4">
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="radio" name="mode" value="bulk"
+              [checked]="store.pricingMode() === 'bulk'"
+              (change)="store.pricingMode.set('bulk')"
+              class="text-brand focus:ring-brand" />
+            <span class="text-sm">散裝</span>
+          </label>
+          <label class="flex items-center gap-1.5 cursor-pointer">
+            <input type="radio" name="mode" value="tag"
+              [checked]="store.pricingMode() === 'tag'"
+              (change)="store.pricingMode.set('tag')"
+              class="text-brand focus:ring-brand" />
+            <span class="text-sm">吊牌</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- Iron cost source -->
+      <div class="mb-4 p-3 bg-gray-50 rounded-lg">
+        <label class="flex items-center gap-2 mb-2 cursor-pointer">
+          <input type="checkbox"
+            [ngModel]="store.useOverride()"
+            (ngModelChange)="store.useOverride.set($event)"
+            class="rounded border-gray-300 text-brand focus:ring-brand/30" />
+          <span class="text-xs text-muted">手動輸入鐵件成本</span>
+        </label>
+        @if (store.useOverride()) {
+          <input type="number" class="form-input" step="0.01"
+            [ngModel]="store.ironCostOverride()"
+            (ngModelChange)="store.ironCostOverride.set($event)" />
+        } @else {
+          <div class="text-sm font-mono tabular-nums">
+            來自模組A: {{ store.ironCost() | currencyTw:4 }}
+          </div>
+        }
+      </div>
+
+      <!-- Handle size -->
+      <div class="form-group mb-3">
+        <label class="form-label">手柄大小</label>
+        <select class="form-select"
+          [ngModel]="store.handleSize()"
+          (ngModelChange)="store.handleSize.set($event)">
+          @for (size of handleSizes; track size) {
+            <option [value]="size">{{ size }}</option>
+          }
+        </select>
+      </div>
+
+      <!-- Handle model -->
+      <div class="form-group mb-3">
+        <label class="form-label">手柄型號</label>
+        <select class="form-select"
+          [ngModel]="store.handleModel()"
+          (ngModelChange)="store.handleModel.set($event)">
+          <option value="K25_DEFAULT">K25 預設</option>
+          <option value="978">978</option>
+          <option value="984">984</option>
+          <option value="986">986</option>
+          <option value="987">987</option>
+          <option value="988">988</option>
+          <option value="992">992</option>
+          <option value="993">993</option>
+          <option value="995">995</option>
+        </select>
+      </div>
+
+      <!-- Carton quantity -->
+      <div class="form-group mb-3">
+        <label class="form-label">紙箱裝量</label>
+        <input type="number" class="form-input"
+          [ngModel]="store.cartonQuantity()"
+          (ngModelChange)="store.cartonQuantity.set($event)" />
+      </div>
+
+      <hr class="my-4 border-gray-200" />
+
+      <!-- Global params quick view -->
+      <h3 class="text-xs font-medium text-gray-500 uppercase mb-2">全域參數</h3>
+      <div class="space-y-1 text-xs">
+        <div class="flex justify-between">
+          <span class="text-muted">稅率</span>
+          <span class="font-mono">{{ store.taxRate() }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-muted">利潤倍率({{ store.pricingMode() === 'bulk' ? '散裝' : '吊牌' }})</span>
+          <span class="font-mono">{{ store.profitRate() }}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-muted">匯率</span>
+          <span class="font-mono">{{ store.exchangeRate() }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RIGHT: Pricing Breakdown (flex-grow) -->
+  <div class="flex-1 overflow-y-auto">
+    <div class="p-6 max-w-lg">
+      <h2 class="text-base font-semibold text-brand mb-1">
+        {{ store.pricingMode() === 'bulk' ? '散裝' : '吊牌' }}售價計算
+      </h2>
+      <p class="text-xs text-muted mb-6">7 步驟定價流程</p>
+
+      @if (!store.loaded()) {
+        <div class="text-center text-muted py-12">載入價格表資料中...</div>
+      } @else {
+        <!-- Pricing waterfall -->
+        <div class="bg-white rounded-lg border border-gray-200 overflow-hidden">
+          @for (step of store.pricingBreakdown(); track step.label) {
+            <div class="flex justify-between items-center px-4 py-2.5 text-sm border-b border-gray-100"
+              [class.bg-brand-light]="step.isTotal"
+              [class.font-bold]="step.isTotal || step.isSub"
+              [class.bg-gray-50]="step.isSub && !step.isTotal">
+              <span [class.text-brand]="step.isTotal">{{ step.label }}</span>
+              <span class="font-mono tabular-nums" [class.text-brand]="step.isTotal">
+                @if (step.isUsd) {
+                  {{ step.value | currencyUsd }}
+                } @else {
+                  {{ step.value | currencyTw:3 }}
+                }
+              </span>
+            </div>
+          }
+        </div>
+
+        <!-- Final summary cards -->
+        <div class="grid grid-cols-3 gap-3 mt-6">
+          <div class="bg-white rounded-lg border border-gray-200 p-3 text-center">
+            <div class="text-xs text-muted mb-1">最終售價</div>
+            <div class="text-lg font-bold text-brand font-mono tabular-nums">
+              {{ store.sellingPrice() | currencyTw:2 }}
+            </div>
+          </div>
+          <div class="bg-white rounded-lg border border-gray-200 p-3 text-center">
+            <div class="text-xs text-muted mb-1">利潤</div>
+            <div class="text-lg font-bold text-green-600 font-mono tabular-nums">
+              {{ store.profit() | currencyTw:2 }}
+            </div>
+          </div>
+          <div class="bg-white rounded-lg border border-gray-200 p-3 text-center">
+            <div class="text-xs text-muted mb-1">美金價</div>
+            <div class="text-lg font-bold font-mono tabular-nums">
+              {{ store.usdPrice() | currencyUsd }}
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+
+</div>

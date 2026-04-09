@@ -1,0 +1,31 @@
+# Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Build output
+sundove-cost-app/dist/
+sundove-cost-app/electron-dist/
+sundove-cost-app/release/
+sundove-cost-app/out-tsc/
+sundove-cost-app/tmp/
+
+# Angular cache
+sundove-cost-app/.angular/
+
+# System files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+!.vscode/mcp.json
+.idea/
+
+# Python
+__pycache__/
+*.pyc

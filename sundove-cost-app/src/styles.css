@@ -1,0 +1,79 @@
+@import 'tailwindcss';
+
+@source "./**/*.{html,ts,scss}";
+
+@theme {
+  /* Brand colors */
+  --color-brand: #1B4F8A;
+  --color-brand-light: #E8F0FA;
+  --color-brand-dark: #0F3260;
+
+  /* Semantic colors */
+  --color-up: #D97706;
+  --color-down: #2D9D5C;
+  --color-danger: #DC2626;
+  --color-muted: #6B7280;
+
+  /* Font families */
+  --font-sans: 'Noto Sans TC', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+}
+
+/* Google Fonts loaded via index.html <link> tag */
+
+/* Tabular numbers for currency alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Yellow flash animation for value updates */
+@keyframes value-flash {
+  0% { background-color: #FEF3C7; }
+  100% { background-color: transparent; }
+}
+
+.value-updated {
+  animation: value-flash 1s ease-out;
+}
+
+/* Global scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #a1a1a1;
+}
+
+/* View Transition: smooth page switch like VS Code tab switching */
+::view-transition-old(root) {
+  animation: none;
+  opacity: 0;
+}
+::view-transition-new(root) {
+  animation: fade-in 120ms ease-out;
+}
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+/* Base body */
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  background-color: #F8F9FA;
+  color: #111827;
+  overflow: hidden;
+}

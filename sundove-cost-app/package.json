@@ -1,0 +1,62 @@
+{
+  "name": "sundove-cost-app",
+  "version": "1.0.0",
+  "author": "Weypro Tech.",
+  "description": "Sundove Cost Calculator",
+  "main": "electron-dist/main.js",
+  "scripts": {
+    "ng": "ng",
+    "start": "ng serve",
+    "build": "ng build",
+    "watch": "ng build --watch --configuration development",
+    "test": "ng test",
+    "electron:compile": "tsc -p tsconfig.electron.json",
+    "electron:dev": "concurrently \"ng serve\" \"wait-on http://localhost:4200 && npm run electron:compile && electron electron-dist/main.js --dev\"",
+    "electron:build": "ng build --configuration production --base-href ./ && npm run electron:compile",
+    "electron:package": "npm run electron:build && electron-builder --win",
+    "electron:package:mac": "npm run electron:build && electron-builder --mac",
+    "electron:package:all": "npm run electron:build && electron-builder --win --mac",
+    "postinstall": "electron-builder install-app-deps"
+  },
+  "prettier": {
+    "printWidth": 100,
+    "singleQuote": true,
+    "overrides": [
+      {
+        "files": "*.html",
+        "options": {
+          "parser": "angular"
+        }
+      }
+    ]
+  },
+  "private": true,
+  "packageManager": "npm@11.8.0",
+  "dependencies": {
+    "@angular/common": "^21.1.0",
+    "@angular/compiler": "^21.1.0",
+    "@angular/core": "^21.1.0",
+    "@angular/forms": "^21.1.0",
+    "@angular/platform-browser": "^21.1.0",
+    "@angular/router": "^21.1.0",
+    "better-sqlite3": "^12.8.0",
+    "rxjs": "~7.8.0",
+    "tslib": "^2.3.0",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "@angular/build": "^21.1.4",
+    "@angular/cdk": "^21.2.6",
+    "@angular/cli": "^21.1.4",
+    "@angular/compiler-cli": "^21.1.0",
+    "@tailwindcss/postcss": "^4.2.2",
+    "@types/better-sqlite3": "^7.6.13",
+    "concurrently": "^9.2.1",
+    "electron": "^41.2.0",
+    "electron-builder": "^26.8.1",
+    "tailwindcss": "^4.2.2",
+    "tsx": "^4.21.0",
+    "typescript": "~5.9.2",
+    "wait-on": "^9.0.4"
+  }
+}

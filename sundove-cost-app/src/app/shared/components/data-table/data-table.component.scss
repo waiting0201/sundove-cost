@@ -1,0 +1,5 @@
+@use '../../styles/tables' as *;
+
+.data-table {
+  @include price-table;
+}

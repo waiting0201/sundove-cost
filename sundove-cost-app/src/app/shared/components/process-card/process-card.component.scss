@@ -1,0 +1,6 @@
+@use '../../styles/cards' as *;
+
+.process-card {
+  @include process-card;
+  margin-bottom: 0.5rem;
+}

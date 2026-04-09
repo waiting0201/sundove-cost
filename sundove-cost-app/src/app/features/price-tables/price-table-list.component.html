@@ -1,0 +1,27 @@
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-xl font-bold text-brand">價格表管理</h1>
+    <span class="text-xs text-muted">共 14 張價格表</span>
+  </div>
+
+  @if (loading()) {
+    <div class="text-center text-muted py-12">載入中...</div>
+  } @else {
+    @for (group of groups; track group) {
+      <div class="mb-6">
+        <h2 class="text-sm font-semibold text-gray-500 uppercase tracking-wide mb-3">{{ group }}</h2>
+        <div class="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+          @for (table of tablesInGroup(group); track table.id) {
+            <button
+              (click)="openTable(table.id)"
+              class="flex flex-col items-start p-4 bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md hover:border-brand/30 transition-all text-left cursor-pointer"
+            >
+              <span class="text-sm font-semibold text-gray-800">{{ table.label }}</span>
+              <span class="text-xs text-muted mt-1">{{ table.rowCount }} 筆資料</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  }
+</div>

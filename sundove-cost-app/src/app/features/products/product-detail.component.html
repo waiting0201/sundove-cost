@@ -1,0 +1,166 @@
+<div class="p-6">
+  <div class="flex items-center justify-between mb-6">
+    <div class="flex items-center gap-3">
+      <button (click)="goBack()" class="text-sm text-muted hover:text-brand transition-colors">← 返回</button>
+      <h1 class="text-xl font-bold text-brand">
+        {{ isNew() ? '新增 SKU' : product()?.sku ?? '載入中...' }}
+      </h1>
+    </div>
+    <div class="flex gap-2">
+      @if (!editing()) {
+        <button (click)="startEdit()"
+          class="px-3 py-1.5 text-sm bg-brand text-white rounded-md hover:bg-brand-dark transition-colors">
+          編輯
+        </button>
+        <button (click)="deleteProduct()"
+          class="px-3 py-1.5 text-sm text-red-600 border border-red-300 rounded-md hover:bg-red-50 transition-colors">
+          刪除
+        </button>
+      }
+    </div>
+  </div>
+
+  <div class="grid grid-cols-3 gap-6">
+    <!-- Left: Specs (editable form) -->
+    <div class="bg-white rounded-lg border border-gray-200 p-4">
+      <h2 class="text-sm font-semibold text-gray-500 uppercase mb-3">產品規格</h2>
+
+      @if (editing()) {
+        <!-- Editable form -->
+        <div class="space-y-3 text-sm">
+          <div>
+            <label class="block text-xs text-muted mb-1">SKU</label>
+            <input type="text" class="form-input" [ngModel]="form().sku" (ngModelChange)="updateForm('sku', $event)" />
+          </div>
+          <div>
+            <label class="block text-xs text-muted mb-1">線徑 (mm)</label>
+            <select class="form-select" [ngModel]="form().wire_diameter" (ngModelChange)="updateForm('wire_diameter', +$event)">
+              <option [ngValue]="3">3</option><option [ngValue]="4">4</option>
+              <option [ngValue]="5">5</option><option [ngValue]="6">6</option><option [ngValue]="8">8</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-muted mb-1">外露長度 (mm)</label>
+            <input type="number" class="form-input" [ngModel]="form().exposed_length" (ngModelChange)="updateForm('exposed_length', +$event)" />
+          </div>
+          <div>
+            <label class="block text-xs text-muted mb-1">內含長度 (mm)</label>
+            <input type="number" class="form-input" [ngModel]="form().internal_length" (ngModelChange)="updateForm('internal_length', +$event)" />
+          </div>
+          <div>
+            <label class="block text-xs text-muted mb-1">材料形體</label>
+            <select class="form-select" [ngModel]="form().material_shape" (ngModelChange)="updateForm('material_shape', $event)">
+              <option value="round">圓鐵</option><option value="hex">六角</option><option value="square">四角</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-muted mb-1">鋼種</label>
+            <select class="form-select" [ngModel]="form().steel_type" (ngModelChange)="updateForm('steel_type', $event)">
+              <option value="8660">8660</option><option value="6150">6150</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-muted mb-1">手柄大小</label>
+            <select class="form-select" [ngModel]="form().handle_size" (ngModelChange)="updateForm('handle_size', $event)">
+              <option value="大大柄">大大柄</option><option value="大柄">大柄</option>
+              <option value="中柄">中柄</option><option value="小柄">小柄</option>
+              <option value="精密柄">精密柄</option><option value="陀螺">陀螺</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs text-muted mb-1">手柄型號</label>
+            <select class="form-select" [ngModel]="form().handle_model" (ngModelChange)="updateForm('handle_model', $event)">
+              <option value="K25_DEFAULT">K25 預設</option>
+              <option value="978">978</option><option value="984">984</option>
+              <option value="986">986</option><option value="987">987</option>
+              <option value="988">988</option><option value="992">992</option>
+              <option value="993">993</option><option value="995">995</option>
+            </select>
+          </div>
+
+          <hr class="border-gray-200" />
+
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="rounded border-gray-300 text-brand" [ngModel]="form().has_hex_ring" (ngModelChange)="updateForm('has_hex_ring', $event)" />
+            <span>六角環</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="rounded border-gray-300 text-brand" [ngModel]="form().has_through_head" (ngModelChange)="updateForm('has_through_head', $event)" />
+            <span>貫通頭</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="rounded border-gray-300 text-brand" [ngModel]="form().has_tp_drill" (ngModelChange)="updateForm('has_tp_drill', $event)" />
+            <span>TP 鑽孔 (+1元)</span>
+          </label>
+          <label class="flex items-center gap-2 cursor-pointer">
+            <input type="checkbox" class="rounded border-gray-300 text-brand" [ngModel]="form().has_stamp" (ngModelChange)="updateForm('has_stamp', $event)" />
+            <span>打字 (+0.2元)</span>
+          </label>
+
+          <div>
+            <label class="block text-xs text-muted mb-1">備註</label>
+            <input type="text" class="form-input" [ngModel]="form().notes" (ngModelChange)="updateForm('notes', $event)" />
+          </div>
+
+          <!-- Save/Cancel -->
+          <div class="flex gap-2 pt-2">
+            <button (click)="save()"
+              class="flex-1 px-3 py-2 text-sm bg-brand text-white rounded-md hover:bg-brand-dark transition-colors">
+              {{ isNew() ? '新增' : '儲存' }}
+            </button>
+            <button (click)="cancelEdit()"
+              class="flex-1 px-3 py-2 text-sm text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
+              取消
+            </button>
+          </div>
+        </div>
+      } @else if (product(); as p) {
+        <!-- Read-only display -->
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span class="text-muted">SKU</span><span class="font-medium">{{ p.sku }}</span></div>
+          <div class="flex justify-between"><span class="text-muted">線徑</span><span>{{ p.wire_diameter }} mm</span></div>
+          <div class="flex justify-between"><span class="text-muted">外露長</span><span>{{ p.exposed_length }} mm</span></div>
+          <div class="flex justify-between"><span class="text-muted">內含長</span><span>{{ p.internal_length }} mm</span></div>
+          <div class="flex justify-between"><span class="text-muted">總長</span><span>{{ p.exposed_length + p.internal_length }} mm</span></div>
+          <div class="flex justify-between"><span class="text-muted">材料</span><span>{{ shapeLabel(p.material_shape) }}</span></div>
+          <div class="flex justify-between"><span class="text-muted">鋼種</span><span>{{ p.steel_type }}</span></div>
+          <div class="flex justify-between"><span class="text-muted">手柄</span><span>{{ p.handle_size ?? '—' }}</span></div>
+          <div class="flex justify-between"><span class="text-muted">型號</span><span>{{ p.handle_model ?? '—' }}</span></div>
+          <div class="flex justify-between"><span class="text-muted">包裝</span><span>{{ p.packaging_type ?? '—' }}</span></div>
+          @if (p.has_hex_ring) { <div class="flex justify-between"><span class="text-muted">六角環</span><span class="text-green-600">✓</span></div> }
+          @if (p.has_through_head) { <div class="flex justify-between"><span class="text-muted">貫通頭</span><span class="text-green-600">✓</span></div> }
+          @if (p.has_tp_drill) { <div class="flex justify-between"><span class="text-muted">TP 鑽孔</span><span class="text-green-600">✓</span></div> }
+          @if (p.has_stamp) { <div class="flex justify-between"><span class="text-muted">打字</span><span class="text-green-600">✓</span></div> }
+          @if (p.notes) { <div class="flex justify-between"><span class="text-muted">備註</span><span>{{ p.notes }}</span></div> }
+        </div>
+      } @else {
+        <div class="text-muted text-center py-4">載入中...</div>
+      }
+    </div>
+
+    <!-- Center: Process breakdown -->
+    <div>
+      <h2 class="text-sm font-semibold text-gray-500 uppercase mb-3">工序成本明細</h2>
+      @for (proc of ironStore.processBreakdown(); track proc.id) {
+        <app-process-card [data]="toProcessCard(proc)" />
+      }
+      <div class="mt-3 p-3 bg-brand-light rounded-lg flex justify-between font-bold text-brand">
+        <span>鐵件總成本</span>
+        <span class="font-mono tabular-nums">{{ ironStore.totalIronCost() | currencyTw:4 }}</span>
+      </div>
+    </div>
+
+    <!-- Right: Pricing -->
+    <div class="space-y-4">
+      <div class="bg-white rounded-lg border border-gray-200 p-4">
+        <h2 class="text-sm font-semibold text-gray-500 uppercase mb-3">散裝售價</h2>
+        <div class="text-2xl font-bold text-brand font-mono tabular-nums">{{ pricingStore.sellingPrice() | currencyTw:2 }}</div>
+        <div class="text-xs text-muted mt-1">USD {{ pricingStore.usdPrice() | currencyUsd }}</div>
+      </div>
+      <div class="bg-white rounded-lg border border-gray-200 p-4">
+        <h2 class="text-sm font-semibold text-gray-500 uppercase mb-3">利潤</h2>
+        <div class="text-xl font-bold text-green-600 font-mono tabular-nums">{{ pricingStore.profit() | currencyTw:2 }}</div>
+      </div>
+    </div>
+  </div>
+</div>
