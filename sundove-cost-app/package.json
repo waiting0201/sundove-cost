@@ -13,7 +13,7 @@
     "electron:compile": "tsc -p tsconfig.electron.json",
     "electron:dev": "concurrently \"ng serve\" \"wait-on http://localhost:4200 && npm run electron:compile && electron electron-dist/main.js --dev\"",
     "electron:build": "ng build --configuration production --base-href ./ && npm run electron:compile",
-    "electron:package": "npm run electron:build && electron-builder --win",
+    "electron:package": "npm run electron:build && npx cross-env CSC_IDENTITY_AUTO_DISCOVERY=false electron-builder --win",
     "electron:package:mac": "npm run electron:build && electron-builder --mac",
     "electron:package:all": "npm run electron:build && electron-builder --win --mac",
     "postinstall": "electron-builder install-app-deps"

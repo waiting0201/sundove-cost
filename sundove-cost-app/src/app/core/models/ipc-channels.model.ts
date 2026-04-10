@@ -5,6 +5,7 @@ export type IpcChannel =
   | 'price-table:update'
   | 'price-table:insert'
   | 'price-table:delete'
+  | 'price-table:get-row'
   | 'price-table:schema'
   // Global params
   | 'global-params:get'

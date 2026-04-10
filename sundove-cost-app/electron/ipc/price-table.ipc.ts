@@ -41,6 +41,12 @@ export function registerPriceTableHandlers(): void {
     return db.prepare(`SELECT * FROM ${tableName}`).all();
   });
 
+  ipcMain.handle('price-table:get-row', (_event, payload: { tableId: string; rowId: number }) => {
+    const tableName = resolveTableName(payload.tableId);
+    const db = getDb();
+    return db.prepare(`SELECT * FROM ${tableName} WHERE id = ?`).get(payload.rowId);
+  });
+
   ipcMain.handle('price-table:update', (_event, payload: { tableId: string; rowId: number; data: Record<string, unknown> }) => {
     const tableName = resolveTableName(payload.tableId);
     const db = getDb();

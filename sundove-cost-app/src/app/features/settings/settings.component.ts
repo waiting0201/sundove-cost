@@ -53,7 +53,7 @@ interface ParamRow {
                   </td>
                   <td class="px-4 py-2 text-xs text-muted">{{ param.module ? '模組 ' + param.module : '' }}</td>
                   <td class="px-4 py-2 text-xs text-muted">{{ param.affects ?? '' }}</td>
-                  <td class="px-4 py-2 text-center">
+                  <td class="px-4 py-2 text-center whitespace-nowrap">
                     @if (editingKey() === param.key) {
                       <button (click)="saveParam(param)" class="text-xs text-brand hover:underline mr-1">儲存</button>
                       <button (click)="cancelEdit()" class="text-xs text-muted hover:underline">取消</button>
